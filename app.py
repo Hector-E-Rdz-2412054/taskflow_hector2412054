@@ -1,10 +1,11 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from src.database import DBManager, crear_tablas
 from src.modelos import Tarea, Proyecto
 
 # Inicialización de la aplicación Flask
 app = Flask(__name__)
+app.secret_key = 'tu_clave_secreta_super_segura_cambiala_en_produccion'
 # Instancia de nuestro gestor de la DB (se conecta o crea las tablas)
 db_manager = DBManager()
 
@@ -68,6 +69,21 @@ def completar_tarea(tarea_id):
     
     # 2. Redirigimos al usuario a la página principal para ver el cambio
     return redirect(url_for('index'))
+
+@app.route('/eliminar/<int:tarea_id>', methods=['POST'])  # NUEVO: Eliminar tareas
+def eliminar_tarea(tarea_id):
+    """Elimina una tarea (solo POST)."""
+    try:
+        resultado = db_manager.eliminar_tarea(tarea_id)
+        if resultado:
+            flash(f"Tarea {tarea_id} eliminada", "success")
+        else:
+            flash(f"Tarea {tarea_id} no encontrada", "error")
+    except Exception as e:
+        flash(f"Error al eliminar tarea: {str(e)}", "error")
+    
+    return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     # Aseguramos que la DB esté inicializada y corremos el servidor

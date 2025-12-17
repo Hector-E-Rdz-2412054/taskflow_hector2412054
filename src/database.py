@@ -146,6 +146,19 @@ class DBManager:
         conn.close()
         return updated
     
+    def eliminar_tarea(self, tarea_id):
+        """Elimina una tarea."""
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("DELETE FROM tareas WHERE id = ?", (tarea_id,))
+        
+        filas_afectadas = cursor.rowcount
+        conn.commit()
+        conn.close()
+        
+        return filas_afectadas > 0
+    
 
 if __name__ == '__main__':
     # Bloque de prueba para la clase
